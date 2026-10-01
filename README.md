@@ -241,7 +241,6 @@ backend/
 │   │
 │   └── Infrastructure/
 │       ├── Config/
-│       ├── Http/
 │       └── Persistence/
 │
 ├── database/
@@ -514,7 +513,7 @@ php -S localhost:8000 -t public
 Desde:
 
 ```text
-frontend-app
+frontend
 ```
 
 ejecutar:
