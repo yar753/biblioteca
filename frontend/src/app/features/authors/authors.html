@@ -1,0 +1,167 @@
+<h2>Autores</h2>
+
+<h3>
+  {{ editingAuthorId === null ? 'Registrar autor' : 'Editar autor' }}
+</h3>
+
+<form
+  [formGroup]="authorForm"
+  (ngSubmit)="
+    editingAuthorId === null
+      ? createAuthor()
+      : updateAuthor()
+  "
+>
+  <label for="firstName">Nombre:</label>
+
+  <input
+    id="firstName"
+    type="text"
+    formControlName="first_name"
+  >
+
+  @if (
+    authorForm.get('first_name')?.invalid &&
+    authorForm.get('first_name')?.touched
+  ) {
+    <small>El nombre es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="lastName">Apellido:</label>
+
+  <input
+    id="lastName"
+    type="text"
+    formControlName="last_name"
+  >
+
+  @if (
+    authorForm.get('last_name')?.invalid &&
+    authorForm.get('last_name')?.touched
+  ) {
+    <small>El apellido es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="nationality">Nacionalidad:</label>
+
+  <input
+    id="nationality"
+    type="text"
+    formControlName="nationality"
+  >
+
+  @if (
+    authorForm.get('nationality')?.invalid &&
+    authorForm.get('nationality')?.touched
+  ) {
+    <small>La nacionalidad es obligatoria.</small>
+  }
+
+  <br><br>
+
+  <label for="birthDate">Fecha de nacimiento:</label>
+
+  <input
+    id="birthDate"
+    type="date"
+    formControlName="birth_date"
+  >
+
+  @if (
+    authorForm.get('birth_date')?.invalid &&
+    authorForm.get('birth_date')?.touched
+  ) {
+    <small>La fecha de nacimiento es obligatoria.</small>
+  }
+
+  <br><br>
+
+  <button type="submit">
+    {{ editingAuthorId === null ? 'Registrar autor' : 'Actualizar autor' }}
+  </button>
+
+  @if (editingAuthorId !== null) {
+    <button
+      type="button"
+      (click)="cancelEdit()"
+    >
+      Cancelar
+    </button>
+  }
+</form>
+
+<hr>
+
+<h3>Lista de autores</h3>
+
+@if (authors.length === 0) {
+
+  <p>No hay autores registrados.</p>
+
+} @else {
+
+  <ul>
+
+    @for (author of authors; track author.id) {
+
+      <li>
+
+        <strong>
+          {{ author.first_name }} {{ author.last_name }}
+        </strong>
+
+        — {{ author.nationality }}
+
+        — Nacimiento: {{ author.birth_date }}
+
+        <br><br>
+
+        <button
+          type="button"
+          (click)="editAuthor(author)"
+        >
+          Editar
+        </button>
+
+        <button
+          type="button"
+          (click)="deleteAuthor(author.id)"
+        >
+          Eliminar
+        </button>
+
+      </li>
+
+      <br>
+    }
+
+  </ul>
+}
+
+@if (totalPages > 1) {
+  <div>
+    <button
+      type="button"
+      (click)="currentPage = currentPage - 1; loadAuthors()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <button
+      type="button"
+      (click)="currentPage = currentPage + 1; loadAuthors()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
+  </div>
+}

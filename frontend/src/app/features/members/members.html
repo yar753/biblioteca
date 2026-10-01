@@ -1,0 +1,185 @@
+<h2>Miembros</h2>
+
+<h3>
+  {{ editingMemberId === null ? 'Registrar miembro' : 'Editar miembro' }}
+</h3>
+
+<form
+  [formGroup]="memberForm"
+  (ngSubmit)="
+    editingMemberId === null
+      ? createMember()
+      : updateMember()
+  "
+>
+  <label for="documentNumber">Documento:</label>
+  <input
+    id="documentNumber"
+    type="text"
+    formControlName="document_number"
+  >
+
+  @if (
+    memberForm.get('document_number')?.invalid &&
+    memberForm.get('document_number')?.touched
+  ) {
+    <small>El número de documento es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="fullName">Nombre completo:</label>
+  <input
+    id="fullName"
+    type="text"
+    formControlName="full_name"
+  >
+
+  @if (
+    memberForm.get('full_name')?.invalid &&
+    memberForm.get('full_name')?.touched
+  ) {
+    <small>El nombre completo es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="email">Email:</label>
+  <input
+    id="email"
+    type="email"
+    formControlName="email"
+  >
+
+  @if (
+    memberForm.get('email')?.invalid &&
+    memberForm.get('email')?.touched
+  ) {
+    <small>
+      @if (memberForm.get('email')?.hasError('required')) {
+        El email es obligatorio.
+      } @else {
+        El email no tiene un formato válido.
+      }
+    </small>
+  }
+
+  <br><br>
+
+  <label for="phone">Teléfono:</label>
+  <input
+    id="phone"
+    type="text"
+    formControlName="phone"
+  >
+
+  <br><br>
+
+  @if (editingMemberId !== null) {
+    <label>
+      <input
+        type="checkbox"
+        formControlName="is_active"
+      >
+      Miembro activo
+    </label>
+
+    <br><br>
+  }
+
+  <button type="submit">
+    {{ editingMemberId === null ? 'Registrar miembro' : 'Actualizar miembro' }}
+  </button>
+
+  @if (editingMemberId !== null) {
+    <button
+      type="button"
+      (click)="cancelEdit()"
+    >
+      Cancelar
+    </button>
+  }
+</form>
+
+<hr>
+
+<h3>Lista de miembros</h3>
+
+@if (members.length === 0) {
+  <p>No hay miembros registrados.</p>
+} @else {
+  <ul>
+    @for (member of members; track member.id) {
+      <li>
+        <strong>{{ member.full_name }}</strong>
+
+        <br>
+
+        Documento: {{ member.document_number }}
+
+        <br>
+
+        Email: {{ member.email }}
+
+        <br>
+
+        Teléfono: {{ member.phone || 'No registrado' }}
+
+        <br>
+
+        Estado:
+        @if (member.is_active) {
+          Activo
+        } @else {
+          Inactivo
+        }
+
+        <br><br>
+
+        <button
+          type="button"
+          (click)="editMember(member)"
+        >
+          Editar
+        </button>
+
+        @if (member.is_active) {
+          <button
+            type="button"
+            (click)="deactivateMember(member.id)"
+          >
+            Desactivar
+          </button>
+        }
+
+        
+      </li>
+
+      <br>
+    }
+  </ul>
+}
+
+@if (totalPages > 1) {
+  <div>
+    <button
+      type="button"
+      (click)="currentPage = currentPage - 1; loadMembers()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <button
+      type="button"
+      (click)="currentPage = currentPage + 1; loadMembers()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
+  </div>
+}

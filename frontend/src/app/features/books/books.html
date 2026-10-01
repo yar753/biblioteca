@@ -1,0 +1,250 @@
+<h2>Libros</h2>
+
+<h3>
+  {{ editingBookId === null ? 'Registrar libro' : 'Editar libro' }}
+</h3>
+
+<form
+  [formGroup]="bookForm"
+  (ngSubmit)="
+    editingBookId === null
+      ? createBook()
+      : updateBook()
+  "
+>
+  <label for="isbn">ISBN:</label>
+
+  <input
+    id="isbn"
+    type="text"
+    formControlName="isbn"
+    maxlength="13"
+  >
+
+  @if (
+    bookForm.get('isbn')?.invalid &&
+    bookForm.get('isbn')?.touched
+  ) {
+    <small>El ISBN es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="title">Título:</label>
+
+  <input
+    id="title"
+    type="text"
+    formControlName="title"
+  >
+
+  @if (
+    bookForm.get('title')?.invalid &&
+    bookForm.get('title')?.touched
+  ) {
+    <small>El título es obligatorio.</small>
+  }
+
+  <br><br>
+
+  <label for="author">Autor:</label>
+
+  <select
+    id="author"
+    formControlName="author_id"
+  >
+    <option [ngValue]="0">Seleccione un autor</option>
+
+    @for (author of authors; track author.id) {
+      <option [ngValue]="author.id">
+        {{ author.first_name }} {{ author.last_name }}
+      </option>
+    }
+  </select>
+
+  @if (
+    bookForm.get('author_id')?.invalid &&
+    bookForm.get('author_id')?.touched
+  ) {
+    <small>Debe seleccionar un autor.</small>
+  }
+
+  <br><br>
+
+  <label for="publicationYear">Año de publicación:</label>
+
+  <input
+    id="publicationYear"
+    type="number"
+    formControlName="publication_year"
+  >
+
+  <br><br>
+
+  <label for="totalCopies">Cantidad total de copias:</label>
+
+  <input
+    id="totalCopies"
+    type="number"
+    min="1"
+    formControlName="total_copies"
+  >
+
+  @if (
+    bookForm.get('total_copies')?.invalid &&
+    bookForm.get('total_copies')?.touched
+  ) {
+    <small>Debe existir al menos una copia.</small>
+  }
+
+  <br><br>
+
+  @if (editingBookId !== null) {
+
+    <label for="availableCopies">Copias disponibles:</label>
+
+    <input
+      id="availableCopies"
+      type="number"
+      min="0"
+      formControlName="available_copies"
+    >
+
+    @if (
+      bookForm.get('available_copies')?.invalid &&
+      bookForm.get('available_copies')?.touched
+    ) {
+      <small>Las copias disponibles no pueden ser negativas.</small>
+    }
+
+    <br><br>
+  }
+
+  <button type="submit">
+    {{ editingBookId === null ? 'Registrar libro' : 'Actualizar libro' }}
+  </button>
+
+  @if (editingBookId !== null) {
+    <button
+      type="button"
+      (click)="cancelEdit()"
+    >
+      Cancelar
+    </button>
+  }
+</form>
+
+<hr>
+
+<h3>Buscar libros</h3>
+
+<div>
+  <input
+    type="text"
+    placeholder="Buscar por título"
+    [(ngModel)]="searchTitle"
+    (keyup.enter)="searchBooks()"
+  >
+
+  <select
+    name="searchAuthor"
+    [(ngModel)]="selectedAuthorId"
+  >
+    <option [ngValue]="null">Todos los autores</option>
+
+    @for (author of authors; track author.id) {
+      <option [ngValue]="author.id">
+        {{ author.first_name }} {{ author.last_name }}
+      </option>
+    }
+  </select>
+
+  <button type="button" (click)="searchBooks()">
+    Buscar
+  </button>
+
+  <button type="button" (click)="loadBooks()">
+    Mostrar todos
+  </button>
+
+  <button type="button" (click)="showAvailableBooks()">
+    Solo disponibles
+  </button>
+</div>
+
+<hr>
+
+<h3>Lista de libros</h3>
+
+@if (books.length === 0) {
+
+  <p>No hay libros encontrados.</p>
+
+} @else {
+
+  <ul>
+
+    @for (book of books; track book.id) {
+
+      <li>
+
+        <strong>{{ book.title }}</strong>
+
+        — ISBN: {{ book.isbn }}
+
+        — Disponibles:
+        {{ book.available_copies }}/{{ book.total_copies }}
+
+        @if (book.available_copies > 0) {
+          <span>— Disponible</span>
+        } @else {
+          <span>— No disponible</span>
+        }
+
+        <br><br>
+
+        <button
+          type="button"
+          (click)="editBook(book)"
+        >
+          Editar
+        </button>
+
+        <button
+          type="button"
+          (click)="deleteBook(book.id)"
+        >
+          Eliminar
+        </button>
+
+      </li>
+
+      <br>
+    }
+
+  </ul>
+}
+
+@if (totalPages > 1) {
+  <div>
+    <button
+      type="button"
+      (click)="currentPage = currentPage - 1; loadBooks()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <button
+      type="button"
+      (click)="currentPage = currentPage + 1; loadBooks()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
+  </div>
+}

@@ -1,0 +1,24 @@
+# Angular
+frontend-app/node_modules/
+frontend-app/.angular/
+frontend-app/dist/
+frontend-app/out-tsc/
+
+# PHP / Composer
+backend/vendor/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log

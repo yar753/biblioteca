@@ -1,0 +1,204 @@
+<h2>Préstamos</h2>
+
+<button type="button" (click)="showForm = !showForm">
+  {{ showForm ? 'Cancelar' : 'Nuevo préstamo' }}
+</button>
+
+@if (showForm) {
+  <form
+    [formGroup]="loanForm"
+    (ngSubmit)="createLoan()"
+  >
+
+    <br>
+
+    <label for="book">Libro:</label>
+
+    <select
+      id="book"
+      formControlName="book_id"
+    >
+      <option [ngValue]="0">
+        Seleccione un libro
+      </option>
+
+      @for (book of availableBooks; track book.id) {
+        <option [ngValue]="book.id">
+          {{ book.title }}
+          — {{ book.available_copies }} disponibles
+        </option>
+      }
+    </select>
+
+    @if (
+      loanForm.get('book_id')?.invalid &&
+      loanForm.get('book_id')?.touched
+    ) {
+      <small>Debe seleccionar un libro.</small>
+    }
+
+    <br><br>
+
+    <label for="member">Miembro:</label>
+
+    <select
+      id="member"
+      formControlName="member_id"
+    >
+      <option [ngValue]="0">
+        Seleccione un miembro
+      </option>
+
+      @for (member of activeMembers; track member.id) {
+        <option [ngValue]="member.id">
+          {{ member.full_name }}
+        </option>
+      }
+    </select>
+
+    @if (
+      loanForm.get('member_id')?.invalid &&
+      loanForm.get('member_id')?.touched
+    ) {
+      <small>Debe seleccionar un miembro.</small>
+    }
+
+    <br><br>
+
+    <label for="loanDate">
+      Fecha de préstamo:
+    </label>
+
+    <input
+      id="loanDate"
+      type="date"
+      formControlName="loan_date"
+    >
+
+    @if (
+      loanForm.get('loan_date')?.invalid &&
+      loanForm.get('loan_date')?.touched
+    ) {
+      <small>La fecha de préstamo es obligatoria.</small>
+    }
+
+    <br>
+
+    <small>
+      El préstamo vence 14 días después de la fecha seleccionada.
+    </small>
+
+    <br><br>
+
+    <button type="submit">
+      Registrar préstamo
+    </button>
+
+  </form>
+}
+
+<hr>
+
+<h3>Lista de préstamos</h3>
+
+<div>
+  <label for="filterMember">Miembro:</label>
+
+  <select
+    id="filterMember"
+    name="filterMember"
+    [(ngModel)]="selectedMemberId"
+  >
+    <option [ngValue]="null">Todos los miembros</option>
+
+    @for (member of members; track member.id) {
+      <option [ngValue]="member.id">
+        {{ member.full_name }}
+      </option>
+    }
+  </select>
+
+  <label for="filterStatus">Estado:</label>
+
+  <select
+    id="filterStatus"
+    name="filterStatus"
+    [(ngModel)]="selectedStatus"
+  >
+    <option [ngValue]="null">Todos los estados</option>
+    <option [ngValue]="'ACTIVE'">Activo</option>
+    <option [ngValue]="'RETURNED'">Devuelto</option>
+  </select>
+
+  <button
+    type="button"
+    (click)="filterLoans()"
+  >
+    Buscar
+  </button>
+</div>
+
+@if (loans.length === 0) {
+  <p>No hay préstamos registrados.</p>
+} @else {
+  <ul>
+    @for (loan of loans; track loan.id) {
+      <li>
+
+        <strong>
+          Préstamo #{{ loan.id }}
+        </strong>
+
+        <br><br>
+
+        <strong>Libro:</strong>
+        {{ getBookTitle(loan.book_id) }}
+
+        <br>
+
+        <strong>Miembro:</strong>
+        {{ getMemberName(loan.member_id) }}
+
+        <br>
+
+        <strong>Fecha de préstamo:</strong>
+        {{ loan.loan_date }}
+
+        <br>
+
+        <strong>Fecha de vencimiento:</strong>
+        {{ loan.due_date }}
+
+        <br>
+
+        @if (loan.status === 'ACTIVE') {
+
+          <strong>Estado: Activo</strong>
+
+          <br><br>
+
+          <button
+            type="button"
+            (click)="returnLoan(loan.id)"
+          >
+            Devolver préstamo
+          </button>
+
+        } @else {
+
+          <strong>Estado: Devuelto</strong>
+
+          <br>
+
+          <strong>Fecha de devolución:</strong>
+          {{ loan.return_date }}
+
+        }
+
+      </li>
+
+      <br>
+    }
+  </ul>
+}
+
